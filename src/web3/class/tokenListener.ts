@@ -149,14 +149,6 @@ export default class GenericEVMTokenListener extends EventEmitter {
 
                     this.emit(ChainEvents.NEW_PAIR, data);
                 } catch (err) {
-                    console.error("Error fetching pair data for", {
-                        token0,
-                        token1,
-                        pair,
-                        id,
-                        chain: this.chain
-                    })
-
                     if (retries < maxRetries) {
                         retries++;
                         setTimeout(registerPair, 1000)
@@ -186,10 +178,10 @@ export default class GenericEVMTokenListener extends EventEmitter {
 
             if (!blockData || !blockData.transactions) return;
 
-            const mintContractTransactions = blockData.transactions.filter(e => {
-                // @ts-ignore
-                return e.to == null
-            })
+            // @ts-ignore
+            const mintContractTransactions = blockData.transactions.filter(e => e.to == null)
+            // @ts-ignore
+            const routerContractRemovedLP = blockData?.transactions.filter(e => e?.to?.toLowerCase() == this.UniswapRouterAddress.toLowerCase() || e.input == "0x7cabdfa0")
 
             // @ts-ignore
             mintContractTransactions?.forEach(async (
