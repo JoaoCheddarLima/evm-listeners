@@ -47,7 +47,7 @@ const contract = new Schema({
 
     rugTimestamp: { type: Number },
     rugHash: { type: String },
-    removedEth: { type: Number, default: 0 }
+    removedEth: { type: String }
 })
 
 contract.index({ address: 1, chain: 1 }, { unique: true })

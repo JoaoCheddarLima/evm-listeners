@@ -6,5 +6,6 @@ export enum ChainTypes {
 export enum ChainEvents {
     NEW_PAIR = 'newPair',
     NEW_BLOCK = 'newBlock',
-    NEW_CONTRACT = 'newContract'
+    NEW_CONTRACT = 'newContract',
+    NEW_SCAM = 'newScam',
 }

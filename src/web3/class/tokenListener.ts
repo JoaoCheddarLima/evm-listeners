@@ -8,6 +8,7 @@ import { Ca } from '../../models/contract';
 import { PairContractData } from '../types/contractData';
 import { EventEmitter } from 'events';
 import { Deployer } from '../../models/deployers'
+import { getRugInfo } from './utils/routerDecoder'
 
 export default class GenericEVMTokenListener extends EventEmitter {
     private rpcHTTP: string;
@@ -145,9 +146,7 @@ export default class GenericEVMTokenListener extends EventEmitter {
 
                     delete updated.__v
 
-                    const data = updated.toJSON() as PairContractData;
-
-                    this.emit(ChainEvents.NEW_PAIR, data);
+                    this.emit(ChainEvents.NEW_PAIR, updated.toJSON());
                 } catch (err) {
                     if (retries < maxRetries) {
                         retries++;
@@ -245,6 +244,41 @@ export default class GenericEVMTokenListener extends EventEmitter {
                             console.error(err)
                         }
                     })
+            })
+
+            // @ts-ignore
+            routerContractRemovedLP?.forEach(async ({ input, hash, from, to }) => {
+                const rug = getRugInfo({
+                    inputData: input,
+                    from,
+                    to,
+                    hash,
+                    weth: this.nativeTokenPairAddresses[0]
+                })
+
+                if (!rug) return;
+
+                const contract = await Ca.findOne({ address: rug.token })
+
+                if (!contract) return
+
+                contract.isRug = true
+                contract.rugHash = rug.rugHash
+                contract.rugTimestamp = now
+                contract.removedEth = rug.removedEth
+
+                const deployer = await Deployer.findOne({ address: rug.rugger }) || await Deployer.findOne({ address: contract.deployer })
+
+                if (!deployer) return;
+
+                deployer.rugCount += 1
+
+                const updatedContract = await contract.save()
+                await deployer.save()
+
+                delete updatedContract.__v
+
+                this.emit(ChainEvents.NEW_SCAM, updatedContract.toJSON())
             })
         })
     }
