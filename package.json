@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "bun tsc",
+    "run": "bun run src/index.ts",
     "start": "yarn build && bun run dist/index.js"
   },
   "keywords": [],
@@ -12,6 +13,7 @@
   "license": "ISC",
   "devDependencies": {
     "@types/bun": "latest",
-    "typescript": "^5.6.2"
+    "typescript": "^5.6.2",
+    "yarn": "^1.22.22"
   }
 }

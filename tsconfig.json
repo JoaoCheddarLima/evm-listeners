@@ -1,13 +1,13 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
+    "target": "ES2020", // or any other target you prefer
+    "module": "CommonJS",
     "moduleResolution": "node",
     "strict": true,
     "esModuleInterop": true,
-    "outDir": "dist",
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "dist"
   },
   "include": ["src"]
 }

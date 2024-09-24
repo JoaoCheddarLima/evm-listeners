@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  web3_socket:
+    build:
+      context: .
+      dockerfile: web3_socket.dockerfile
+    image: web3_socket:latest
+    restart: always
