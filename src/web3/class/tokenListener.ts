@@ -167,7 +167,6 @@ export default class GenericEVMTokenListener extends EventEmitter {
 
             registerPair();
         })
-
     }
 
     public listenForNewContracts() {
@@ -183,7 +182,6 @@ export default class GenericEVMTokenListener extends EventEmitter {
             const mintContractTransactions = blockData.transactions.filter(e => e.to == null)
             // @ts-ignore
             const routerContractRemovedLP = blockData?.transactions.filter(e => e?.to?.toLowerCase() == this.UniswapRouterAddress.toLowerCase() || e.input == "0x7cabdfa0")
-
             // @ts-ignore
             mintContractTransactions?.forEach(async (
                 {
@@ -249,7 +247,6 @@ export default class GenericEVMTokenListener extends EventEmitter {
                         }
                     })
             })
-
             // @ts-ignore
             routerContractRemovedLP?.forEach(async ({ input, hash, from, to }) => {
                 const rug = getRugInfo({
