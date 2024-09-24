@@ -39,7 +39,7 @@ Bun.serve({
     },
     websocket: {
         message(ws, message) {
-            console.log(RoomManager)
+            
         },
         open(ws) {
             if(!ws.data) return ws.close(1008, "Missing data");
