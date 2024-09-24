@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "bun tsc",
-    "run": "bun run src/index.ts",
-    "start": "yarn build && bun run dist/index.js"
+    "app": "bun run dist/index.js",
+    "start": "yarn build && yarn app"
   },
   "keywords": [],
   "author": "",

@@ -6,7 +6,7 @@ import './rooms/loaders';
 import './web3';
 
 Bun.serve({
-    port: 8292,
+    port: process.env.PORT,
     fetch(req, server) {
         const sessionId = generateSessionUUID();
 
