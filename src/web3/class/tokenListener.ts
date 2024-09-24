@@ -145,6 +145,8 @@ export default class GenericEVMTokenListener extends EventEmitter {
                     const updated = await token.save();
 
                     delete updated.__v
+                    // @ts-ignore
+                    delete updated._id
 
                     this.emit(ChainEvents.NEW_PAIR, updated.toJSON());
                 } catch (err) {
@@ -217,7 +219,7 @@ export default class GenericEVMTokenListener extends EventEmitter {
 
                             const isTokenCa = name ? symbol ? supply ? true : false : false : false
 
-                            await Ca.create({
+                            const newCa = await Ca.create({
                                 address: contract,
                                 deploySupply: supply,
                                 deployer,
@@ -235,11 +237,13 @@ export default class GenericEVMTokenListener extends EventEmitter {
 
                             deployerModel.deploys += 1
 
-                            const updatedModel = await deployerModel.save()
+                            await deployerModel.save()
 
-                            delete updatedModel.__v
+                            delete newCa.__v
+                            // @ts-ignore
+                            delete newCa._id
 
-                            this.emit(ChainEvents.NEW_CONTRACT, updatedModel.toJSON())
+                            this.emit(ChainEvents.NEW_CONTRACT, newCa.toJSON())
                         } catch (err) {
                             console.error(err)
                         }
@@ -277,6 +281,8 @@ export default class GenericEVMTokenListener extends EventEmitter {
                 await deployer.save()
 
                 delete updatedContract.__v
+                // @ts-ignore
+                delete updatedContract._id
 
                 this.emit(ChainEvents.NEW_SCAM, updatedContract.toJSON())
             })
