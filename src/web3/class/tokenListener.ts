@@ -59,17 +59,6 @@ export default class GenericEVMTokenListener extends EventEmitter {
         this.provider.getBlockNumber()
             .then(async (blockNumber) => {
                 console.log(`[🚀] Connected to ${this.chain} at block ${blockNumber}`)
-
-                if (this.chain === ChainTypes.BASE) {
-                    const pool = new this.web3.eth.Contract(pairAbi, "0x2BC470ce1b76CbBE8b5aB77Da88E4Bf6Ac7169E7")
-
-                    const { _reserve0, _reserve1 }: {
-                        _reserve0: number;
-                        _reserve1: number;
-                    } = await pool.methods.getReserves().call()
-
-
-                }
             })
 
         this.FactoryContract = GenericEVMTokenListener.LOAD_MINUMUM_NECESSARY_FACTORY_ABI_CONTRACT_INSTANCE(UniswapFactoryAddress, this.provider);

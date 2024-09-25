@@ -1,5 +1,3 @@
-import { RoomManager } from "../rooms"
-import { SocketEvents } from "../types"
 import GenericEVMTokenListener from "./class/tokenListener"
 import { ChainEvents, ChainTypes } from "./types"
 import { connect } from 'mongoose'
@@ -12,8 +10,6 @@ const {
     ETH_RPC_HTTP, ETH_RPC_WSS, ETH_UNISWAP_FACTORY, ETH_UNISWAP_ROUTER, ETH_NATIVE_TOKEN_PAIRS,
     BASE_RPC_HTTP, BASE_RPC_WSS, BASE_UNISWAP_FACTORY, BASE_UNISWAP_ROUTER, BASE_NATIVE_TOKEN_PAIRS
 } = process.env
-
-if (!RoomManager.getRoom(SocketEvents.NewPairs)) throw new Error('Room not found')
 
 const Ethereum = new GenericEVMTokenListener({
     chain: ChainTypes.ETH,
@@ -36,6 +32,6 @@ const Base = new GenericEVMTokenListener({
 Ethereum.on(ChainEvents.NEW_CONTRACT, (data) => {
     console.log(data)
 })
-Base.on(ChainEvents.NEW_CONTRACT, (data) => {
+Base.on(ChainEvents.NEW_PAIR, (data) => {
     console.log(data)
 })
