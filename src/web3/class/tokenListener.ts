@@ -88,16 +88,16 @@ export default class GenericEVMTokenListener extends EventEmitter {
                     } = await pool.methods.getReserves().call()
 
                     if (this.nativeTokenPairAddresses.includes(token0)) {
-                        tokenIn = token0;
-                        tokenOut = token1;
+                        tokenIn = token0.toLowerCase();
+                        tokenOut = token1.toLowerCase();
 
                         wethAmount = formatEther(_reserve0)
                         tokenAmount = _reserve1
                     };
 
                     if (this.nativeTokenPairAddresses.includes(token1)) {
-                        tokenIn = token1;
-                        tokenOut = token0;
+                        tokenIn = token1.toLowerCase();
+                        tokenOut = token0.toLowerCase();
 
                         wethAmount = formatEther(_reserve1)
                         tokenAmount = _reserve0
@@ -105,9 +105,9 @@ export default class GenericEVMTokenListener extends EventEmitter {
 
                     const token = await Ca.findOne({ address: tokenOut })
 
-                    if (!token || !tokenAmount || !token.supply) return;
+                    if (!token || !tokenAmount || !token.supply) return console.log(`[!] Token not found for ${tokenOut} - ${this.chain}`);
 
-                    token.pair = pair
+                    token.pair = pair.toLowerCase()
                     token.baseLp = tokenIn
                     token.baseToken = tokenOut
                     token.pairCreatedTimestamp = timestamp
@@ -190,9 +190,9 @@ export default class GenericEVMTokenListener extends EventEmitter {
                         }
                     ) => {
                         try {
-                            if (!logs || !logs[0]) return;
+                            if (logs?.length <= 0) return;
 
-                            const contract = logs[0].address
+                            const contract = logs[0].address.toLowerCase()
                             const deployer = from
 
                             const ca = new this.web3.eth.Contract(baseAbi, contract)
@@ -205,6 +205,10 @@ export default class GenericEVMTokenListener extends EventEmitter {
                             ])).map(e => e.status == "fulfilled" ? e.value : null)
 
                             const isTokenCa = name ? symbol ? supply ? true : false : false : false
+
+                            const existentToken = await Ca.findOne({ address: contract })
+
+                            if(existentToken) return;
 
                             const newCa = await Ca.create({
                                 address: contract,
