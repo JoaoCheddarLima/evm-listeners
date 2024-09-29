@@ -3,7 +3,6 @@ import { RoomManager } from "./rooms";
 import { SocketEvents, WebSocketData } from "./types";
 import { generateSessionUUID } from "./utils/session";
 import './rooms/loaders';
-import './web3';
 
 Bun.serve({
     port: process.env.PORT,
@@ -45,7 +44,6 @@ Bun.serve({
             if(!ws.data) return ws.close(1008, "Missing data");
             
             const data = ws.data as WebSocketData;
-
             //attention here idk why did I force this types they just fixed the error, don't make tests with this code
             RoomManager.addClientToRoom(data.roomName, ws as ServerWebSocket);
         },

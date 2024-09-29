@@ -8,4 +8,5 @@ export enum ChainEvents {
     NEW_BLOCK = 'newBlock',
     NEW_CONTRACT = 'newContract',
     NEW_SCAM = 'newScam',
+    NEW_VERIFIED = 'newVerified',
 }

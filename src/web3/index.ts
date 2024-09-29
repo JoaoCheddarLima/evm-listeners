@@ -29,16 +29,4 @@ const Base = new GenericEVMTokenListener({
     UniswapRouterAddress: BASE_UNISWAP_ROUTER!
 })
 
-Ethereum.on(ChainEvents.NEW_CONTRACT, (data) => {
-    console.log(`[!] New Contract ${data.address} - ${data.chain}`)
-})
-Ethereum.on(ChainEvents.NEW_PAIR, (data) => {
-    console.log(`[!] New pair ${data.address} - ${data.chain}`)
-})
-
-Base.on(ChainEvents.NEW_CONTRACT, (data) => {
-    console.log(`[!] New pair ${data.address} - ${data.chain}`)
-})
-Base.on(ChainEvents.NEW_PAIR, (data) => {
-    console.log(`[!] New pair ${data.address} - ${data.chain}`)
-})
+export { Ethereum, Base, ChainEvents }

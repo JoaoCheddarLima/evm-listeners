@@ -206,10 +206,6 @@ export default class GenericEVMTokenListener extends EventEmitter {
 
                             const isTokenCa = name ? symbol ? supply ? true : false : false : false
 
-                            const existentToken = await Ca.findOne({ address: contract })
-
-                            if(existentToken) return;
-
                             const newCa = await Ca.create({
                                 address: contract,
                                 deploySupply: supply,

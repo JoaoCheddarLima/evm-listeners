@@ -9,6 +9,8 @@ export enum SocketEvents {
 
     RuggedPairs = 'rugged-pairs',
 
+    NewContracts = 'new-contracts',
+
 }
 
 export type RoomNames = `${SocketEvents}`;
