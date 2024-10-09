@@ -69,6 +69,7 @@ export default class GenericEVMTokenListener extends EventEmitter {
     public listenForNewPairs() {
         console.log("[👋] Listening for new pairs on", this.chain)
         this.FactoryContract.on("PairCreated", async (token0, token1, pair, id) => {
+            const block = await this.web3.eth.getBlock("latest")
             let timestamp = Date.now();
 
             let retries = 0;
@@ -112,6 +113,7 @@ export default class GenericEVMTokenListener extends EventEmitter {
                     token.baseToken = tokenOut
                     token.pairCreatedTimestamp = timestamp
                     token.initialLiquidity = wethAmount
+                    token.pairBlock = Number(block.number)
                     token.initialSupply = String(tokenAmount).split("n")[0]
 
                     const ca = new this.web3.eth.Contract(baseAbi, token.address)
@@ -212,6 +214,7 @@ export default class GenericEVMTokenListener extends EventEmitter {
                                 deployer,
                                 deployHash: hash,
                                 deployTimestamp: now,
+                                creationBlock: blockNumber,
                                 name,
                                 symbol,
                                 supply,

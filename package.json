@@ -17,6 +17,7 @@
     "yarn": "^1.22.22"
   },
   "dependencies": {
+    "axios": "^1.7.7",
     "bignumber.js": "^9.1.2",
     "ethereum-input-data-decoder": "^0.4.2",
     "ethers": "^6.13.2",

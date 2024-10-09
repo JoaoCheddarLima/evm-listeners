@@ -3,6 +3,13 @@ import { RoomManager } from "./rooms";
 import { SocketEvents, WebSocketData } from "./types";
 import { generateSessionUUID } from "./utils/session";
 import './rooms/loaders';
+import { UpdateDefiService } from "./service/defi";
+
+UpdateDefiService()
+
+setInterval(async () => {
+    UpdateDefiService()
+}, 5 * 1000)
 
 Bun.serve({
     port: process.env.PORT,
@@ -38,18 +45,18 @@ Bun.serve({
     },
     websocket: {
         message(ws, message) {
-            
+
         },
         open(ws) {
-            if(!ws.data) return ws.close(1008, "Missing data");
-            
+            if (!ws.data) return ws.close(1008, "Missing data");
+
             const data = ws.data as WebSocketData;
             //attention here idk why did I force this types they just fixed the error, don't make tests with this code
             RoomManager.addClientToRoom(data.roomName, ws as ServerWebSocket);
         },
-        close(ws, code, message) { 
-            if(!ws.data) return ws.close(1008, "Missing data");
-            
+        close(ws, code, message) {
+            if (!ws.data) return ws.close(1008, "Missing data");
+
             const data = ws.data as WebSocketData;
 
             RoomManager.removeClientFromRoom(data.roomName, ws as ServerWebSocket);
