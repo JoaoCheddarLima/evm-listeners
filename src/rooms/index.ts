@@ -1,5 +1,5 @@
 import { ServerWebSocket } from "bun";
-import { Room, RoomNames, SocketEvents } from "../types";
+import { Room, SocketEvents } from "../types";
 import { encriptData } from "../utils/encription";
 
 export class RoomManager {

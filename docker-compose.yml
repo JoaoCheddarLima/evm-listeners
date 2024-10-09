@@ -7,8 +7,5 @@ services:
       dockerfile: web3_socket.dockerfile
     image: web3_socket:latest
     restart: always
-    environment:
-      - SECRET_KEY
-      - PORT
     ports:
       - "${PORT}:${PORT}"

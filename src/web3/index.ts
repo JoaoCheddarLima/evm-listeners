@@ -1,10 +1,13 @@
 import GenericEVMTokenListener from "./class/tokenListener"
 import { ChainEvents, ChainTypes } from "./types"
+
 import { connect } from 'mongoose'
 
 connect(process.env.MONGO_URI!, {
     autoIndex: true
 })
+    .then(() => console.log('✨ Connected to MongoDB'))
+    .catch(err => console.error(err))
 
 const {
     ETH_RPC_HTTP, ETH_RPC_WSS, ETH_UNISWAP_FACTORY, ETH_UNISWAP_ROUTER, ETH_NATIVE_TOKEN_PAIRS,
