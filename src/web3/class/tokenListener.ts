@@ -5,7 +5,6 @@ import pairAbi from './abis/pair.json'
 import baseAbi from './abis/example.json'
 import { ChainEvents, ChainTypes } from '../types/chain';
 import { Ca } from '../../models/contract';
-import { PairContractData } from '../types/contractData';
 import { EventEmitter } from 'events';
 import { Deployer } from '../../models/deployers'
 import { getRugInfo } from './utils/routerDecoder'
@@ -236,6 +235,7 @@ export default class GenericEVMTokenListener extends EventEmitter {
                             this.emit(ChainEvents.NEW_CONTRACT, newCa.toJSON())
                         } catch (err) {
                             console.error(err)
+                            console.log("falhou aqui")
                         }
                     })
             })

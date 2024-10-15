@@ -58,7 +58,7 @@ const contract = new Schema({
     txCount: { type: Number, default: 0 },
     buys: { type: Number, default: 0 },
     sells: { type: Number, default: 0 },
-    volume: { type: String, default: 0 },
+    volume: { type: Number, default: 0 },
 
     lastUpdate: { type: Number }
 })

@@ -29,13 +29,19 @@ export async function UpdateDefiService() {
             config.blockNumber = lastTrade.blockNumber + 1
         }
 
-        updateHolderData({
-            ...config,
-            deployBlock: ca.pairBlock!
-        })
-        updateDefiData({
-            ...config,
-            address: ca.pair!
-        })
+        // console.log(`[!!] CICLE ${ca.pair} on ${ca.chain}`)
+
+        await Promise.all([
+            updateHolderData({
+                ...config,
+                deployBlock: ca.pairBlock!
+            }),
+            updateDefiData({
+                ...config,
+                address: ca.pair!
+            })
+        ])
+
+        // process.stdout.write(`[!!] END CICLE ${ca.pair} on ${ca.chain}\n\n\n`)
     }
 }

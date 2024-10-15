@@ -25,6 +25,7 @@ export async function updateHolderData({
     deployBlock: number;
 }): Promise<void> {
     try {
+        // console.log(`[!!] Fetchin holder data for ${address} on ${chain}`)
         async function getAllHolders(contract: Web3Contract<any>) {
             const events = await contract.getPastEvents("Transfer", {
                 fromBlock: blockNumber,
@@ -34,9 +35,11 @@ export async function updateHolderData({
             const holders = {};
             const snipers: string[] = []
 
+            // console.log(`[!!] Found ${events.length} transfers for ${address} on ${chain}`)
+
             events.forEach((event, i) => {
                 // @ts-ignore
-                if(Number(event.blockNumber) + 2 > deployBlock){
+                if (Number(event.blockNumber) + 2 > deployBlock) {
                     // @ts-ignore
                     snipers.push(event.returnValues.to)
                 }
@@ -58,14 +61,18 @@ export async function updateHolderData({
         }
 
         const contract = new web3.eth.Contract(ExampleABI as any, address);
-
+        
         const totalSupply = Number(await contract.methods.totalSupply().call())
+
+        // console.log(`[!!] Total supply for ${address} on ${chain} is ${totalSupply}`)
 
         const {
             holders: historicalHolders,
             transferCount,
             snipers
         } = await getAllHolders(contract);
+
+        // console.log(historicalHolders, transferCount, snipers)
 
         const concurrent: Promise<Holder>[] = []
 
@@ -85,8 +92,9 @@ export async function updateHolderData({
 
         historicalHolders.forEach(holder => concurrent.push(calculateHolderAmounts(holder)))
 
-        const holdersWithAmounts = await Promise.all(concurrent)
-        historicalHolders.shift()
+        const holdersWithAmounts = (await Promise.all(concurrent)).filter(h => !h.error)
+
+        // console.log(holdersWithAmounts)
 
         const existingData = await Ca.findOne({ address, chain });
 
@@ -95,6 +103,8 @@ export async function updateHolderData({
                 holdersWithAmounts.push(holder);
             }
         });
+
+        // console.log(existingData?.holders, holdersWithAmounts)
 
         await Ca.updateOne({
             address,
@@ -107,6 +117,6 @@ export async function updateHolderData({
             snipers
         });
     } catch (err) {
-        console.error(err)
+        console.log("Update holder data failed ", address, chain)
     }
 }

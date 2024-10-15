@@ -20,7 +20,11 @@ export async function updateDefiData({
     try {
         const nativeTokens = chainRpc(chain).NativeTokenPairs || [];
 
+        // console.log(`[!!] Fetchin data for ${address} on ${chain}`)
+
         const token0: string = await new web3.eth.Contract(ExampleABI as any, address).methods.token0().call()
+
+        // console.log(`[!!] Token0: ${token0}`)
 
         const trades: {
             type: 'buy' | 'sell',
@@ -42,7 +46,7 @@ export async function updateDefiData({
 
             const isFirst = nativeTokens.includes(token0)
 
-            events.forEach((event, i) => {
+            for (const event of events) {
                 // @ts-ignore
                 const zeroIn = Number(formatUnits(event?.returnValues.amount0In.toString()))
                 // @ts-ignore
@@ -51,35 +55,74 @@ export async function updateDefiData({
                 const oneIn = Number(formatUnits(event?.returnValues.amount1In.toString()))
                 // @ts-ignore
                 const oneOut = Number(formatUnits(event?.returnValues.amount1Out.toString()))
+
                 // @ts-ignore
                 if (isFirst) {
                     if (zeroIn > 0) {
                         buys += 1
                         volume += zeroIn
 
-                        trades.push({
+                        const data = {
                             type: 'buy',
                             ethAmount: zeroIn,
                             // @ts-ignore
                             txHash: event.transactionHash,
                             // @ts-ignore
                             blockNumber: Number(event.blockNumber)
-                        })
+                        }
+                        // @ts-ignore
+                        trades.push(data)
 
                     } else {
                         sells += 1
                         volume += zeroOut
+
+                        const data = {
+                            type: 'sell',
+                            ethAmount: zeroIn,
+                            // @ts-ignore
+                            txHash: event.transactionHash,
+                            // @ts-ignore
+                            blockNumber: Number(event.blockNumber)
+                        }
+
+                        // @ts-ignore
+                        trades.push(data)
                     }
                 } else {
                     if (oneIn > 0) {
+                        const data = {
+                            type: 'buy',
+                            ethAmount: oneIn,
+                            // @ts-ignore
+                            txHash: event.transactionHash,
+                            // @ts-ignore
+                            blockNumber: Number(event.blockNumber)
+                        }
+
                         buys += 1
                         volume += oneIn
+
+                        // @ts-ignore
+                        trades.push(data)
                     } else {
                         sells += 1
                         volume += oneOut
+
+                        const data = {
+                            type: 'sell',
+                            ethAmount: oneOut,
+                            // @ts-ignore
+                            txHash: event.transactionHash,
+                            // @ts-ignore
+                            blockNumber: Number(event.blockNumber)
+                        }
+
+                        // @ts-ignore
+                        trades.push(data)
                     }
                 }
-            });
+            }
 
             return {
                 volume,
@@ -91,6 +134,8 @@ export async function updateDefiData({
 
         const contract = new web3.eth.Contract(ExampleABI as any, address);
 
+        // console.log(`[!!] Fetchin data for ${address} on ${chain}`)
+
         const {
             volume,
             buys,
@@ -98,17 +143,23 @@ export async function updateDefiData({
             txCount
         } = await getSwaps(contract);
 
+        // console.log(`[!!] Got data for ${address} on ${chain}`)
+
         await Ca.updateOne(
             {
                 pair: address
             },
             {
-                volume,
-                buys,
-                sells,
-                txCount
+                $inc: {
+                    volume: volume,
+                    buys: buys,
+                    sells: sells,
+                    txCount: txCount
+                }
             }
         )
+
+        // console.log(`[!!] Updated data for ${address} on ${chain}`)
 
         await Trades.findOneAndUpdate(
             {
@@ -125,7 +176,11 @@ export async function updateDefiData({
                 upsert: true
             }
         )
+
+        // console.log(`[!!] Updated trades for ${address} on ${chain}`)
+
     } catch (err) {
-        console.error(err)
+        // @ts-ignore
+        console.log("Update defi data failed ", address, chain, err.message)
     }
 }
