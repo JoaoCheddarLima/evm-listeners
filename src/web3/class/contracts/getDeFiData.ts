@@ -181,6 +181,6 @@ export async function updateDefiData({
 
     } catch (err) {
         // @ts-ignore
-        console.log("Update defi data failed ", address, chain, err.message)
+        // console.log("Update defi data failed ", address, chain, err.message)
     }
 }

@@ -1,6 +1,6 @@
 import { ServerWebSocket } from "bun";
 import { Room, SocketEvents } from "../types";
-import { encriptData } from "../utils/encription";
+import { encryptData } from "../utils/encription";
 
 export class RoomManager {
     public static rooms: Map<SocketEvents, Room> = new Map();
@@ -14,7 +14,7 @@ export class RoomManager {
     }
 
     public static replyEncriptedMessage(client: ServerWebSocket, message: string) {
-        const encryptedMessage = encriptData(message);
+        const encryptedMessage = encryptData(message);
 
         client.send(encryptedMessage);
     }

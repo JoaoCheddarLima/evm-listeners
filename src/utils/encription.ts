@@ -1,21 +1,21 @@
-import { createHash } from 'crypto';
+import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
 
-export function encriptData(data: string) {
-    const hash = createHash('sha1')
+const algorithm = 'aes-256-cbc';
+const key = Buffer.from(process.env.SECRET_KEY || '', 'hex');
 
-    hash.update(data + process.env.SECRET_KEY);
-
-    const encryptedMessage = hash.digest('hex');
-
-    return encryptedMessage;
+export function encryptData(data: string): string {
+  const iv = randomBytes(16);
+  const cipher = createCipheriv(algorithm, key, iv);
+  let encrypted = cipher.update(data, 'utf8', 'hex');
+  encrypted += cipher.final('hex');
+  return iv.toString('hex') + ':' + encrypted;
 }
 
-export function decriptData(data: string) {
-    const hash = createHash('sha1')
-
-    hash.update(data + process.env.SECRET_KEY);
-
-    const encryptedMessage = hash.digest('hex');
-
-    return encryptedMessage;
+export function decryptData(encryptedData: string): string {
+  const [ivHex, encryptedText] = encryptedData.split(':');
+  const iv = Buffer.from(ivHex, 'hex');
+  const decipher = createDecipheriv(algorithm, key, iv);
+  let decrypted = decipher.update(encryptedText, 'hex', 'utf8');
+  decrypted += decipher.final('utf8');
+  return decrypted;
 }

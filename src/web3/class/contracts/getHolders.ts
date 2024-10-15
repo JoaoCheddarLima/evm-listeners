@@ -117,6 +117,6 @@ export async function updateHolderData({
             snipers
         });
     } catch (err) {
-        console.log("Update holder data failed ", address, chain)
+        // console.log("Update holder data failed ", address, chain)
     }
 }
