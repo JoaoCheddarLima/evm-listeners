@@ -28,6 +28,9 @@ Object.values(SocketEvents)
             case SocketEvents.VerifiedPairs:
                 emitEvent(elem, ChainEvents.NEW_VERIFIED);
                 break;
+            case SocketEvents.UpdatePairs:
+                emitEvent(elem, ChainEvents.UPDATE_PAIRS);
+                break
             default:
                 break;
         }

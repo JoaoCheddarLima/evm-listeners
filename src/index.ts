@@ -64,3 +64,16 @@ Bun.serve({
         drain(ws) { },
     },
 });
+
+//THIS IS A TRASH DANGEROUS ERROR HANDLER THAT DOES NOT EVEN MAKE SENSE TO USE. DO NOT USE THIS IN PRODUCTION
+
+process.on('unhandRejection', (reason, promise) => {
+    console.error(`🚨 | [Erro]\n\n + ${reason} ${promise}`);
+    console.error(promise)
+});
+process.on('uncaughtException', (error, origin) => {
+    console.error(`🚨 | [Erro]\n\n + ${error}, ${origin}`);
+});
+process.on('uncaughtExceptionMonitor', (error, origin) => {
+    console.error(`🚨 | [Erro]\n\n + ${error}, ${origin}`);
+});

@@ -8,6 +8,7 @@ import { Ca } from '../../models/contract';
 import { EventEmitter } from 'events';
 import { Deployer } from '../../models/deployers'
 import { getRugInfo } from './utils/routerDecoder'
+import { LastBlock } from '../../models/block'
 
 export default class GenericEVMTokenListener extends EventEmitter {
     private rpcHTTP: string;
@@ -63,6 +64,21 @@ export default class GenericEVMTokenListener extends EventEmitter {
         this.FactoryContract = GenericEVMTokenListener.LOAD_MINUMUM_NECESSARY_FACTORY_ABI_CONTRACT_INSTANCE(UniswapFactoryAddress, this.provider);
         this.listenForNewContracts();
         this.listenForNewPairs();
+
+        setInterval(async () => {
+            const tokens = await this.getActiveRecentTokens()
+
+            if (tokens.length <= 0) return;
+
+            this.emit(ChainEvents.UPDATE_PAIRS, tokens)
+        }, 5000)
+    }
+    public async getActiveRecentTokens() {
+        return await Ca.find({
+            chain: this.chain,
+            pair: { $ne: null },
+            lastUpdate: { $gt: Date.now() - (1000 * 60 * 30) }
+        }).select({ _id: 0, __v: 0 }).lean()
     }
 
     public listenForNewPairs() {
@@ -231,7 +247,7 @@ export default class GenericEVMTokenListener extends EventEmitter {
                             delete newCa.__v
                             // @ts-ignore
                             delete newCa._id
-                            
+
                             this.emit(ChainEvents.NEW_CONTRACT, newCa.toJSON())
                         } catch (err) {
                             console.error(err)

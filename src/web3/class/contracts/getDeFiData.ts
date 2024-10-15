@@ -177,8 +177,18 @@ export async function updateDefiData({
             }
         )
 
-        // console.log(`[!!] Updated trades for ${address} on ${chain}`)
-
+        if(trades.length > 0) {
+            await Ca.updateOne(
+                {
+                    pair: address
+                },
+                {
+                    $set: {
+                        lastUpdate: Date.now()
+                    }
+                }
+            )
+        }
     } catch (err) {
         // @ts-ignore
         // console.log("Update defi data failed ", address, chain, err.message)

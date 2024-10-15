@@ -112,7 +112,6 @@ export async function updateHolderData({
         }, {
             holders: holdersWithAmounts,
             holdersCount: holdersWithAmounts.length,
-            lastUpdate: Date.now(),
             transfers: transferCount,
             snipers
         });

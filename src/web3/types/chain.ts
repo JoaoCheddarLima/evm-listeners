@@ -9,4 +9,5 @@ export enum ChainEvents {
     NEW_CONTRACT = 'newContract',
     NEW_SCAM = 'newScam',
     NEW_VERIFIED = 'newVerified',
+    UPDATE_PAIRS = 'updatePairs',
 }
