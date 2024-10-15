@@ -231,7 +231,7 @@ export default class GenericEVMTokenListener extends EventEmitter {
                             delete newCa.__v
                             // @ts-ignore
                             delete newCa._id
-
+                            
                             this.emit(ChainEvents.NEW_CONTRACT, newCa.toJSON())
                         } catch (err) {
                             console.error(err)

@@ -41,7 +41,7 @@ export class RoomManager {
 
             localRoom.clients.add(client);
         } catch (err) {
-
+            console.log(err)
         }
     }
 
