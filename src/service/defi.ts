@@ -8,7 +8,8 @@ import { Trades } from "../models/trades"
 
 export async function UpdateDefiService() {
     const tokens = await Ca.find({
-        pair: { $ne: null }
+        pair: { $ne: null },
+        lastUpdate: { $gt: Date.now() - 1000 * 60 * 10  }
     })
 
     if (!tokens) return

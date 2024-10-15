@@ -57,6 +57,7 @@ build/Release
 # Dependency directories
 
 /node_modules
+test.ts
 jspm_packages/
 yarn.lock
 bun.lockb

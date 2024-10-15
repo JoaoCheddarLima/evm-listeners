@@ -9,6 +9,7 @@ import { EventEmitter } from 'events';
 import { Deployer } from '../../models/deployers'
 import { getRugInfo } from './utils/routerDecoder'
 import { LastBlock } from '../../models/block'
+import { Trades } from '../../models/trades'
 
 export default class GenericEVMTokenListener extends EventEmitter {
     private rpcHTTP: string;
@@ -74,11 +75,24 @@ export default class GenericEVMTokenListener extends EventEmitter {
         }, 5000)
     }
     public async getActiveRecentTokens() {
-        return await Ca.find({
+        const activeTokens = await Ca.find({
             chain: this.chain,
             pair: { $ne: null },
-            lastUpdate: { $gt: Date.now() - (1000 * 60 * 30) }
+            lastUpdate: { $gt: Date.now() - (1000 * 60 * 5) }
         }).select({ _id: 0, __v: 0 }).lean()
+
+        const updatedTokens: any[] = []
+
+        for (const token of activeTokens) {
+            const trades = await Trades.findOne({ address: token.pair }).select({ _id: 0, __v: 0 }).lean()
+
+            updatedTokens.push({
+                ...token,
+                transactions: trades?.history
+            })
+        }
+
+        return updatedTokens
     }
 
     public listenForNewPairs() {
@@ -130,6 +144,7 @@ export default class GenericEVMTokenListener extends EventEmitter {
                     token.initialLiquidity = wethAmount
                     token.pairBlock = Number(block.number)
                     token.initialSupply = String(tokenAmount).split("n")[0]
+                    token.lastUpdate = Date.now()
 
                     const ca = new this.web3.eth.Contract(baseAbi, token.address)
 

@@ -79,7 +79,7 @@ export async function updateDefiData({
 
                         const data = {
                             type: 'sell',
-                            ethAmount: zeroIn,
+                            ethAmount: zeroOut,
                             // @ts-ignore
                             txHash: event.transactionHash,
                             // @ts-ignore
