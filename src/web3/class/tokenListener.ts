@@ -18,7 +18,7 @@ export default class GenericEVMTokenListener extends EventEmitter {
     private UniswapRouterAddress: string;
     private provider: WebSocketProvider;
     private web3: Web3;
-    private FactoryContract: Contract;
+    private FactoryContract!: Contract;
     private nativeTokenPairAddresses: string[];
     private chain: ChainTypes;
 
@@ -57,14 +57,24 @@ export default class GenericEVMTokenListener extends EventEmitter {
         this.provider = new WebSocketProvider(this.rpcWSS);
         this.web3 = new Web3(this.rpcHTTP);
 
-        this.provider.getBlockNumber()
-            .then(async (blockNumber) => {
-                console.log(`[🚀] Connected to ${this.chain} at block ${blockNumber}`)
-            })
+        const connect = () => {
+            if (this.provider) {
+                this.provider.destroy()
+            }
 
-        this.FactoryContract = GenericEVMTokenListener.LOAD_MINUMUM_NECESSARY_FACTORY_ABI_CONTRACT_INSTANCE(UniswapFactoryAddress, this.provider);
-        this.listenForNewContracts();
-        this.listenForNewPairs();
+            this.provider = new WebSocketProvider(this.rpcWSS);
+            this.web3 = new Web3(this.rpcHTTP);
+
+            this.provider.getBlockNumber()
+                .then(async (blockNumber) => {
+                    console.log(`[🚀] Connected to ${this.chain} at block ${blockNumber}`)
+                })
+
+            this.FactoryContract = GenericEVMTokenListener.LOAD_MINUMUM_NECESSARY_FACTORY_ABI_CONTRACT_INSTANCE(UniswapFactoryAddress, this.provider);
+            this.listenForNewContracts();
+            this.listenForNewPairs();
+        }
+
 
         setInterval(async () => {
             const tokens = await this.getActiveRecentTokens()
@@ -73,6 +83,9 @@ export default class GenericEVMTokenListener extends EventEmitter {
 
             this.emit(ChainEvents.UPDATE_PAIRS, tokens)
         }, 5000)
+
+        connect()
+        setInterval(connect, 30 * 1000 * 60)
     }
     public async getActiveRecentTokens() {
         const activeTokens = await Ca.find({
