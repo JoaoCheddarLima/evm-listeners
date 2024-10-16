@@ -5,6 +5,7 @@ import { ChainTypes } from "../../types";
 import { chainRpc } from "../../../utils/chainRpc";
 import { formatUnits } from "ethers";
 import { Trades } from "../../../models/trades";
+import BigNumber from "bignumber.js";
 
 export async function updateDefiData({
     address,
@@ -30,7 +31,8 @@ export async function updateDefiData({
             type: 'buy' | 'sell',
             ethAmount: number,
             txHash: string,
-            blockNumber: number
+            blockNumber: number,
+            tokenAmount: number
         }[] = []
 
         async function getSwaps(contract: Web3Contract<any>) {
@@ -65,6 +67,7 @@ export async function updateDefiData({
                         const data = {
                             type: 'buy',
                             ethAmount: zeroIn,
+                            tokenAmount: oneOut,
                             // @ts-ignore
                             txHash: event.transactionHash,
                             // @ts-ignore
@@ -80,6 +83,7 @@ export async function updateDefiData({
                         const data = {
                             type: 'sell',
                             ethAmount: zeroOut,
+                            tokenAmount: oneIn,
                             // @ts-ignore
                             txHash: event.transactionHash,
                             // @ts-ignore
@@ -94,6 +98,7 @@ export async function updateDefiData({
                         const data = {
                             type: 'buy',
                             ethAmount: oneIn,
+                            tokenAmount: zeroOut,
                             // @ts-ignore
                             txHash: event.transactionHash,
                             // @ts-ignore
@@ -112,6 +117,7 @@ export async function updateDefiData({
                         const data = {
                             type: 'sell',
                             ethAmount: oneOut,
+                            tokenAmount: zeroIn,
                             // @ts-ignore
                             txHash: event.transactionHash,
                             // @ts-ignore
@@ -177,7 +183,7 @@ export async function updateDefiData({
             }
         )
 
-        if(trades.length > 0) {
+        if (trades.length > 0) {
             await Ca.updateOne(
                 {
                     pair: address
@@ -189,8 +195,67 @@ export async function updateDefiData({
                 }
             )
         }
+
+        const token = await Ca.findOne({
+            pair: address
+        })
+
+        const tradeData = (await Trades.findOne({
+            address
+        }))?.history || []
+
+        if (!token) return;
+        function calculateTokenPrice(liquidityA: any, liquidityB: any, tokenAmount: any) {
+            const newLiquidityA = new BigNumber(liquidityA).minus(tokenAmount);
+            const newLiquidityB = new BigNumber(liquidityA).times(liquidityB).div(newLiquidityA);
+
+            const pricePerTokenA = newLiquidityB.div(newLiquidityA)
+
+            return pricePerTokenA.toString();
+        }
+
+        function calculateMarketCap(tokenPrice: any, totalSupply: any) {
+            return new BigNumber(tokenPrice).times(totalSupply).toString()
+        }
+
+        // @ts-ignore
+        const parsedSupply = token.initialSupply / 10 ** token.decimals!
+
+        const tokenOnPool = tradeData.reduce((acc, trade) => {
+            if (trade.type === 'buy') {
+                return acc.minus(trade.tokenAmount!)
+            }
+
+            return acc.plus(trade.tokenAmount)
+        }, new BigNumber(parsedSupply)).toString()
+
+        const ethOnPool = tradeData.reduce((acc, trade) => {
+            if (trade.type === 'buy') {
+                return acc.plus(trade.ethAmount)
+            }
+
+            return acc.minus(trade.ethAmount)
+        }, new BigNumber(0)).plus(token.initialLiquidity!).toString()
+
+        const price = calculateTokenPrice(Number(tokenOnPool), Number(ethOnPool), 0)
+        const marketcap = calculateMarketCap(price, new BigNumber(parsedSupply).minus(tokenOnPool).toString())
+        const initialPrice = calculateTokenPrice(parsedSupply, token.initialLiquidity, 0)
+
+        await Ca.updateOne(
+            {
+                pair: address
+            },
+            {
+                $set: {
+                    marketcap,
+                    price,
+                    initialPrice,
+                    liquidity: ethOnPool
+                }
+            }
+        )
     } catch (err) {
         // @ts-ignore
-        // console.log("Update defi data failed ", address, chain, err.message)
+        console.log("Update defi data failed ", address, chain, err.message)
     }
 }

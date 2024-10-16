@@ -38,6 +38,11 @@ const contract = new Schema({
     initialLiquidity: { type: String },
     initialSupply: { type: String },
 
+    marketcap: { type: String, default: '0' },
+    price: { type: String, default: '0' },
+    initialPrice: { type: String, default: '0' },
+    liquidity: { type: String, default: '0' },
+
     isRennounced: { type: Boolean, default: false, index: true },
     isVerified: { type: Boolean, default: false, index: true },
     isHoneypot: { type: Boolean, default: false, index: true },

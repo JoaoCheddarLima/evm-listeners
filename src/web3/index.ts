@@ -1,3 +1,4 @@
+import { UpdateDefiService } from "../service/defi"
 import GenericEVMTokenListener from "./class/tokenListener"
 import { ChainEvents, ChainTypes } from "./types"
 
@@ -6,7 +7,14 @@ import { connect } from 'mongoose'
 connect(process.env.MONGO_URI!, {
     autoIndex: true
 })
-    .then(() => console.log('✨ Connected to MongoDB'))
+    .then(() => {
+        console.log('✨ Connected to MongoDB')
+        UpdateDefiService()
+
+        setInterval(async () => {
+            UpdateDefiService()
+        }, 5 * 1000)
+    })
     .catch(err => console.error(err))
 
 const {

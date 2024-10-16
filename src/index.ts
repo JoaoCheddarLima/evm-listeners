@@ -3,13 +3,6 @@ import { RoomManager } from "./rooms";
 import { SocketEvents, WebSocketData } from "./types";
 import { generateSessionUUID } from "./utils/session";
 import './rooms/loaders';
-import { UpdateDefiService } from "./service/defi";
-
-UpdateDefiService()
-
-setInterval(async () => {
-    UpdateDefiService()
-}, 5 * 1000)
 
 Bun.serve({
     port: process.env.PORT,
